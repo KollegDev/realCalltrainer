@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CallTrainer — Verkaufsgespräch üben</title>
+    <style>
+      :root {
+        --bg: #0f1117;
+        --panel: #181b24;
+        --line: #262b38;
+        --text: #e7e9ee;
+        --muted: #9aa3b2;
+        --accent: #4f8cff;
+        --danger: #ff5d5d;
+        --good: #36d399;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        padding: 24px;
+      }
+      .app { width: 100%; max-width: 720px; }
+      h1 { font-size: 20px; margin: 0 0 4px; }
+      .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+      button {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #222735;
+        color: var(--text);
+        cursor: pointer;
+        transition: filter .15s;
+      }
+      button:hover:not(:disabled) { filter: brightness(1.2); }
+      button:disabled { opacity: .4; cursor: not-allowed; }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+      .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 12px; }
+      .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+      .dot.live { background: var(--good); box-shadow: 0 0 8px var(--good); }
+      .dot.paused { background: #f5c542; }
+      .label { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 8px; }
+      .transcript { height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+      .turn { padding: 8px 12px; border-radius: 8px; max-width: 85%; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+      .turn.rep { align-self: flex-end; background: #2a3550; }
+      .turn.prospect { align-self: flex-start; background: #2b2f3c; }
+      .turn .who { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+      select {
+        background: #222735; color: var(--text); border: 1px solid var(--line);
+        border-radius: 8px; padding: 8px; font-size: 14px; width: 100%;
+      }
+      .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+      .err { color: var(--danger); font-size: 13px; margin-top: 10px; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <h1>CallTrainer</h1>
+      <p class="sub">Übe ein Live-Verkaufsgespräch mit einem KI-Kunden — und höre dann deine letzte Antwort so ab, wie sie am Telefon klang.</p>
+
+      <div class="panel">
+        <div class="label">Szenario</div>
+        <select id="scenario"></select>
+
+        <div class="label" style="margin-top:14px;">Mikrofon</div>
+        <select id="mic"></select>
+        <div id="micMeter" class="hint">Mikrofonpegel: <span id="micLevel">—</span></div>
+        <div class="hint">Tipp: Nutze Kopfhörer, damit die KI sich nicht selbst hört. Wähle oben dein echtes Mikrofon (kein virtuelles/VR-Gerät).</div>
+      </div>
+
+      <div class="panel">
+        <div class="controls">
+          <button id="startBtn" class="primary">Anruf starten</button>
+          <button id="pauseBtn" disabled>Pause</button>
+          <button id="replayBtn" disabled>Letzte Antwort abspielen</button>
+          <button id="endBtn" class="danger" disabled>Anruf beenden</button>
+        </div>
+        <div class="status">
+          <span id="dot" class="dot"></span>
+          <span id="statusText">Bereit</span>
+        </div>
+        <div id="error" class="err"></div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Transkript</div>
+        <div id="transcript" class="transcript"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

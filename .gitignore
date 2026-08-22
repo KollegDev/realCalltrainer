@@ -1,0 +1,13 @@
+# Secrets - the .env holds a real Gemini API key. NEVER commit it.
+.env
+
+# Dependencies and build output
+node_modules/
+dist/
+
+# Archive the project was extracted from - not source
+*.rar
+
+# OS noise
+Thumbs.db
+.DS_Store

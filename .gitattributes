@@ -1,0 +1,3 @@
+# .bat files must stay CRLF - LF batch files mis-parse goto and
+# multi-line if blocks (same lesson as the main callTrainer repo).
+*.bat text eol=crlf

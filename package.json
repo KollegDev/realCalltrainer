@@ -1,0 +1,19 @@
+{
+  "name": "calltrainer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Sales call trainer - speech-to-speech AI prospect with replay of your own voice (phone-filtered).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@google/genai": "latest"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "latest",
+    "vite": "latest"
+  }
+}
