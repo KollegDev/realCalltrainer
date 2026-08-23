@@ -5,307 +5,318 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CallTrainer — Verkaufsgespräch üben</title>
     <style>
-      /* ── Liquid glass on warm off-white ──────────────────────────────────
-         Translucent, blurred panels over a soft, warm background with faint
-         colour-tint glows. Centered, symmetric, calm. Text #333 for warmth
-         and trust instead of hard black. */
+      /* ── Liquid Glass, emulates aaii.up.railway.app ──────────────────────
+         Farbnebel auf #f3f4f8, transluzente Karten (blur 18px, saturate 170%),
+         Glas-Navbar, Kicker-Überschriften, dunkle Pill-Buttons.
+         Typo: Inter, Fließtext 16/24, Titel 700 mit -0.03em. */
+
       :root {
-        --bg: #f6f3ee;            /* warm off-white */
-        --text: #333333;
-        --muted: #8b867c;
-        --accent: #5b8def;
-        --accent-soft: rgba(91, 141, 239, 0.14);
-        --danger: #e2574f;
-        --danger-soft: rgba(226, 87, 79, 0.12);
+        --ink: #1e2025;          /* headings, primary text */
+        --body: #62656e;         /* running text */
+        --muted: #8a8d96;
+        --accent: #6384ff;
+        --accent-soft: rgba(99, 132, 255, 0.13);
         --good: #2fa47c;
         --warn: #d9a13b;
-        --glass: rgba(255, 255, 255, 0.55);
-        --glass-strong: rgba(255, 255, 255, 0.72);
-        --glass-border: rgba(255, 255, 255, 0.65);
-        --glass-inner: rgba(255, 255, 255, 0.35);
-        --shadow: 0 18px 40px -18px rgba(91, 141, 239, 0.25),
-                  0 8px 24px -12px rgba(51, 51, 51, 0.10);
+        --danger: #cf4437;
+        --danger-soft: rgba(207, 68, 55, 0.10);
+        --hairline: rgba(20, 22, 28, 0.06);
       }
+
       * { box-sizing: border-box; }
-      html, body { min-height: 100%; }
+
       body {
         margin: 0;
-        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        display: flex;
-        justify-content: center;
-        padding: 40px 20px 64px;
-        position: relative;
-        overflow-x: hidden;
+        background: #f3f4f8;
+        color: var(--body);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font-size: 16px;
+        line-height: 24px;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
       }
-      /* Faint colour-tint glows behind the glass — the "light through the
-         pane" effect. Fixed, symmetric, non-interactive. */
-      body::before, body::after {
-        content: '';
-        position: fixed;
-        z-index: -1;
-        width: 60vmax;
-        height: 60vmax;
-        border-radius: 50%;
-        filter: blur(90px);
-        pointer-events: none;
-      }
+
+      /* Farbnebel hinter dem Glas */
       body::before {
-        top: -25vmax;
-        left: 50%;
-        transform: translateX(-85%);
-        background: radial-gradient(circle,
-          rgba(91, 141, 239, 0.18), rgba(91, 141, 239, 0) 65%);
-      }
-      body::after {
-        bottom: -30vmax;
-        left: 50%;
-        transform: translateX(-15%);
-        background: radial-gradient(circle,
-          rgba(240, 176, 122, 0.20), rgba(240, 176, 122, 0) 65%);
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background:
+          radial-gradient(45% 40% at 15% 8%, rgba(99, 132, 255, 0.18), transparent 70%),
+          radial-gradient(40% 45% at 88% 18%, rgba(178, 140, 255, 0.14), transparent 70%),
+          radial-gradient(50% 40% at 55% 100%, rgba(110, 200, 255, 0.12), transparent 70%);
       }
 
-      .app { width: 100%; max-width: 680px; }
+      .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px 56px; }
 
-      h1 {
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        margin: 0 0 6px;
-        text-align: center;
-      }
-      .sub {
-        color: var(--muted);
-        font-size: 14px;
-        margin: 0 auto 28px;
-        text-align: center;
-        max-width: 46ch;
+      :focus-visible { outline: 2px solid #16181d; outline-offset: 2px; border-radius: 6px; }
+
+      /* ——— Glas-Grundrezept ——— */
+      .glass {
+        background: rgba(255, 255, 255, 0.55);
+        -webkit-backdrop-filter: blur(18px) saturate(170%);
+        backdrop-filter: blur(18px) saturate(170%);
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.75);
       }
 
-      .panel {
-        background: var(--glass);
-        backdrop-filter: blur(22px) saturate(1.5);
-        -webkit-backdrop-filter: blur(22px) saturate(1.5);
-        border: 1px solid var(--glass-border);
-        border-radius: 22px;
-        box-shadow: var(--shadow);
-        padding: 22px 24px;
-        margin-bottom: 20px;
+      /* ——— Navbar ——— */
+      header.bar {
+        position: sticky;
+        top: 12px;
+        z-index: 10;
+        max-width: 720px;
+        margin: 12px auto 0;
+        padding: 0 20px;
       }
-
-      .label {
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .09em;
-        color: var(--muted);
-        margin-bottom: 8px;
-        text-align: center;
-      }
-
-      .row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-      .row > div { flex: 1; min-width: 210px; }
-
-      select, textarea, input[type="text"] {
-        background: var(--glass-inner);
-        color: var(--text);
-        border: 1px solid var(--glass-border);
-        border-radius: 12px;
-        padding: 10px 12px;
-        font-size: 14px;
-        width: 100%;
-        font-family: inherit;
-        text-align: center;
-        text-align-last: center;
-        outline: none;
-        transition: border-color .15s, box-shadow .15s;
-      }
-      textarea { text-align: left; min-height: 260px; font-size: 13px; line-height: 1.5; resize: vertical; }
-      select:focus, textarea:focus, input:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px var(--accent-soft);
-      }
-
-      button {
-        font-size: 14px;
-        font-weight: 600;
-        padding: 11px 20px;
-        border-radius: 999px;
-        border: 1px solid var(--glass-border);
-        background: var(--glass-strong);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        color: var(--text);
-        cursor: pointer;
-        transition: transform .12s, box-shadow .15s, background .15s;
-        box-shadow: 0 6px 18px -10px rgba(51, 51, 51, 0.25);
-      }
-      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 22px -10px rgba(51,51,51,.3); }
-      button:active:not(:disabled) { transform: translateY(0); }
-      button:disabled { opacity: .38; cursor: not-allowed; }
-      button.primary {
-        background: linear-gradient(140deg, #6a9bf5, var(--accent));
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 10px 26px -10px rgba(91, 141, 239, 0.55);
-      }
-      button.danger {
-        background: linear-gradient(140deg, #ec6f66, var(--danger));
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 10px 26px -10px rgba(226, 87, 79, 0.5);
-      }
-      button.small { font-size: 12px; padding: 7px 14px; font-weight: 500; }
-
-      .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-
-      .status {
+      header.bar .glass {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: 14px;
+        gap: 12px;
+        min-height: 52px;
+        padding: 0 18px;
+        border-radius: 14px;
       }
-      .dot { width: 10px; height: 10px; border-radius: 50%; background: #c9c4ba; }
-      .dot.live { background: var(--good); box-shadow: 0 0 10px rgba(47, 164, 124, .6); }
+      .brand { font-weight: 600; color: var(--ink); }
+      header.bar .tagline { margin-left: auto; font-size: 14px; color: var(--muted); white-space: nowrap; }
+
+      /* ——— Hero ——— */
+      .hero { padding: 40px 0 8px; }
+      h1 {
+        margin: 0 0 6px;
+        font-size: clamp(28px, 6vw, 34px);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        color: var(--ink);
+      }
+      .intro { margin: 0; max-width: 34rem; }
+
+      /* ——— Sektionen: Kicker + Glaskarte ——— */
+      section { margin-top: 32px; }
+      h2, .label {
+        margin: 0 0 10px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #7a7d86;
+      }
+      .card { padding: 20px; }
+
+      .row { display: flex; gap: 14px; flex-wrap: wrap; }
+      .row > div { flex: 1; min-width: 210px; }
+
+      /* ——— Formulare ——— */
+      select, textarea, input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid rgba(20, 22, 28, 0.10);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.75);
+        font: inherit;
+        font-size: 14px;
+        color: var(--ink);
+      }
+      select:focus, textarea:focus, input:focus { border-color: var(--muted); outline: none; }
+      textarea { min-height: 260px; font-size: 13px; line-height: 1.55; resize: vertical; }
+
+      /* ——— Buttons: dunkle Pill primär, Glas-Pill sekundär ——— */
+      button {
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 22px;
+        border: 1px solid rgba(20, 22, 28, 0.10);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--ink);
+        cursor: pointer;
+        transition: background 160ms ease, transform 120ms ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      button:hover:not(:disabled) { background: #fff; }
+      button:active:not(:disabled) { transform: scale(0.98); }
+      button:disabled { opacity: .35; cursor: not-allowed; }
+      button.primary { background: #16181d; border-color: #16181d; color: #fff; }
+      button.primary:hover:not(:disabled) { background: #000; }
+      button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+      button.danger:hover:not(:disabled) { background: #b23a2f; }
+      button.small { font-size: 13px; padding: 7px 16px; }
+
+      .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+
+      /* ——— Status ——— */
+      .status { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); margin-top: 14px; }
+      .dot { width: 9px; height: 9px; border-radius: 50%; background: #c3c6cf; }
+      .dot.live { background: var(--good); box-shadow: 0 0 8px rgba(47, 164, 124, .55); }
       .dot.paused { background: var(--warn); }
-      .dot.ringing { background: var(--accent); box-shadow: 0 0 10px var(--accent-soft); }
+      .dot.ringing { background: var(--accent); box-shadow: 0 0 8px var(--accent-soft); }
 
-      .roletag { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; }
-      .editbar { display: flex; gap: 10px; margin-top: 12px; align-items: center; justify-content: center; }
-      .edited-badge { font-size: 11px; color: var(--warn); }
-      #editPanel { display: none; margin-top: 14px; }
+      .roletag { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+      .editbar { display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap; }
+      .edited-badge { font-size: 12px; color: var(--warn); }
+      #editPanel { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--hairline); }
       #editPanel.open { display: block; }
+      #editPanel .label { margin-top: 12px; }
+      #editPanel .label:first-child { margin-top: 0; }
 
-      .hint { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; }
-      .err { color: var(--danger); font-size: 13px; margin-top: 12px; white-space: pre-wrap; text-align: center; }
+      .hint { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 20px; }
+      .err { color: var(--danger); font-size: 14px; margin-top: 12px; white-space: pre-wrap; }
 
-      .transcript { height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
+      /* ——— Transkript ——— */
+      .transcript { height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
       .turn {
         padding: 9px 13px;
-        border-radius: 14px;
+        border-radius: 13px;
         max-width: 85%;
         font-size: 14px;
-        line-height: 1.45;
+        line-height: 1.5;
         white-space: pre-wrap;
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        color: #3d4048;
+        border: 1px solid var(--hairline);
       }
       .turn.rep { align-self: flex-end; background: var(--accent-soft); border-bottom-right-radius: 5px; }
-      .turn.prospect { align-self: flex-start; background: var(--glass-strong); border-bottom-left-radius: 5px; }
-      .turn .who { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+      .turn.prospect { align-self: flex-start; background: rgba(255, 255, 255, 0.8); border-bottom-left-radius: 5px; }
+      .turn .who { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 2px; }
 
-      /* scorecard */
+      /* ——— Scorecard ——— */
       #scorecard { display: none; }
       #scorecard.open { display: block; }
-      .score-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; }
+      .score-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
       .score-num { font-size: 52px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
       .score-num.good { color: var(--good); }
       .score-num.mid { color: var(--warn); }
       .score-num.bad { color: var(--danger); }
-      .score-verdict { font-size: 14px; max-width: 52ch; }
-      .score-outcome { font-size: 12px; color: var(--muted); }
-      .score-cols { display: flex; gap: 18px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
+      .score-verdict { font-size: 15px; color: var(--ink); font-weight: 500; max-width: 46ch; }
+      .score-outcome { font-size: 13px; color: var(--muted); margin-top: 2px; }
+      .score-cols { display: flex; gap: 18px; margin-top: 18px; flex-wrap: wrap; }
       .score-cols > div { flex: 1; min-width: 220px; }
-      .score-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.55; }
-      .score-block { margin-top: 14px; font-size: 13px; line-height: 1.55; text-align: center; }
-      .score-block b { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; }
-      .score-metrics {
-        display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
-        margin-top: 18px; padding-top: 16px;
-        border-top: 1px solid var(--glass-border);
+      .score-list { margin: 6px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.55; color: #3d4048; }
+      .score-block { margin-top: 16px; font-size: 14px; line-height: 1.55; color: #3d4048; }
+      .score-block b {
+        display: block; margin-bottom: 2px;
+        color: #7a7d86; font-weight: 600; font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.08em;
       }
-      .metric { font-size: 12px; color: var(--muted); text-align: center; }
-      .metric b { display: block; font-size: 17px; color: var(--text); }
+      .score-metrics {
+        display: flex; gap: 22px; flex-wrap: wrap;
+        margin-top: 18px; padding-top: 16px;
+        border-top: 1px solid var(--hairline);
+      }
+      .metric { font-size: 12px; color: var(--muted); }
+      .metric b { display: block; font-size: 17px; font-weight: 600; color: var(--ink); }
+
+      @media (prefers-reduced-motion: reduce) {
+        button { transition: none; }
+        button:active:not(:disabled) { transform: none; }
+      }
     </style>
   </head>
   <body>
-    <div class="app">
-      <h1>CallTrainer</h1>
-      <p class="sub">Übe ein Live-Verkaufsgespräch mit einem KI-Kunden — mit Bewertung nach dem Anruf.</p>
+    <header class="bar">
+      <div class="glass">
+        <span class="brand">CallTrainer</span>
+        <span class="tagline">Kaltakquise üben</span>
+      </div>
+    </header>
 
-      <div class="panel">
-        <div class="row">
-          <div>
-            <div class="label">Gesprächspartner</div>
-            <select id="scenario"></select>
-            <div id="roleTag" class="roletag"></div>
+    <div class="wrap">
+      <div class="hero">
+        <h1>Verkaufsgespräche üben</h1>
+        <p class="intro">Ein KI-Kunde geht ans Telefon und verhält sich wie ein echter Mensch — kurz angebunden, skeptisch, legt auch mal auf. Danach bekommst du eine ehrliche Bewertung.</p>
+      </div>
+
+      <section>
+        <h2>Szenario</h2>
+        <div class="glass card">
+          <div class="row">
+            <div>
+              <div class="label">Gesprächspartner</div>
+              <select id="scenario"></select>
+              <div id="roleTag" class="roletag"></div>
+            </div>
+            <div>
+              <div class="label">Schwierigkeit</div>
+              <select id="difficulty"></select>
+            </div>
           </div>
-          <div>
-            <div class="label">Schwierigkeit</div>
-            <select id="difficulty"></select>
-          </div>
-        </div>
 
-        <div class="editbar">
-          <button id="editBtn" class="small">Rolle bearbeiten</button>
-          <span id="editedBadge" class="edited-badge"></span>
-        </div>
-
-        <div id="editPanel">
-          <div class="label">Begrüßung beim Abheben</div>
-          <input type="text" id="editGreeting" />
-          <div class="label" style="margin-top:12px;">System-Prompt (inkl. verdeckter Spielregeln — frei anpassbar)</div>
-          <textarea id="editPrompt" spellcheck="false"></textarea>
           <div class="editbar">
-            <button id="saveRoleBtn" class="small primary">Speichern</button>
-            <button id="resetRoleBtn" class="small">Auf Original zurücksetzen</button>
+            <button id="editBtn" class="small">Rolle bearbeiten</button>
+            <span id="editedBadge" class="edited-badge"></span>
           </div>
-        </div>
 
-        <div class="label" style="margin-top:18px;">Mikrofon</div>
-        <select id="mic"></select>
-        <div id="micMeter" class="hint">Mikrofonpegel: <span id="micLevel">—</span></div>
-        <div class="hint">Tipp: Nutze Kopfhörer, damit die KI sich nicht selbst hört. Wähle oben dein echtes Mikrofon (kein virtuelles/VR-Gerät).</div>
-      </div>
-
-      <div class="panel">
-        <div class="controls">
-          <button id="startBtn" class="primary">Anrufen</button>
-          <button id="pauseBtn" disabled>Pause</button>
-          <button id="replayBtn" disabled>Letzte Antwort abspielen</button>
-          <button id="endBtn" class="danger" disabled>Auflegen</button>
-        </div>
-        <div class="status">
-          <span id="dot" class="dot"></span>
-          <span id="statusText">Bereit</span>
-        </div>
-        <div id="error" class="err"></div>
-      </div>
-
-      <div id="scorecard" class="panel">
-        <div class="label">Bewertung</div>
-        <div class="score-head">
-          <div id="scoreNum" class="score-num">–</div>
-          <div>
-            <div id="scoreVerdict" class="score-verdict"></div>
-            <div id="scoreOutcome" class="score-outcome"></div>
+          <div id="editPanel">
+            <div class="label">Begrüßung beim Abheben</div>
+            <input type="text" id="editGreeting" />
+            <div class="label">System-Prompt (inkl. verdeckter Spielregeln — frei anpassbar)</div>
+            <textarea id="editPrompt" spellcheck="false"></textarea>
+            <div class="editbar">
+              <button id="saveRoleBtn" class="small primary">Speichern</button>
+              <button id="resetRoleBtn" class="small">Auf Original zurücksetzen</button>
+            </div>
           </div>
-        </div>
-        <div class="score-cols">
-          <div>
-            <b class="label">Stärken</b>
-            <ul id="scoreStrengths" class="score-list"></ul>
-          </div>
-          <div>
-            <b class="label">Fehler</b>
-            <ul id="scoreMistakes" class="score-list"></ul>
-          </div>
-        </div>
-        <div id="scoreMissed" class="score-block"></div>
-        <div id="scoreNext" class="score-block"></div>
-        <div id="scoreLines" class="score-block"></div>
-        <div id="scoreMetrics" class="score-metrics"></div>
-      </div>
 
-      <div class="panel">
-        <div class="label">Transkript</div>
-        <div id="transcript" class="transcript"></div>
-      </div>
+          <div class="label" style="margin-top:18px;">Mikrofon</div>
+          <select id="mic"></select>
+          <div id="micMeter" class="hint">Mikrofonpegel: <span id="micLevel">—</span></div>
+          <div class="hint">Tipp: Nutze Kopfhörer, damit die KI sich nicht selbst hört. Wähle dein echtes Mikrofon (kein virtuelles/VR-Gerät).</div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Anruf</h2>
+        <div class="glass card">
+          <div class="controls">
+            <button id="startBtn" class="primary">Anrufen</button>
+            <button id="pauseBtn" disabled>Pause</button>
+            <button id="replayBtn" disabled>Letzte Antwort abspielen</button>
+            <button id="endBtn" class="danger" disabled>Auflegen</button>
+          </div>
+          <div class="status">
+            <span id="dot" class="dot"></span>
+            <span id="statusText">Bereit</span>
+          </div>
+          <div id="error" class="err"></div>
+        </div>
+      </section>
+
+      <section id="scorecard">
+        <h2>Bewertung</h2>
+        <div class="glass card">
+          <div class="score-head">
+            <div id="scoreNum" class="score-num">–</div>
+            <div>
+              <div id="scoreVerdict" class="score-verdict"></div>
+              <div id="scoreOutcome" class="score-outcome"></div>
+            </div>
+          </div>
+          <div class="score-cols">
+            <div>
+              <div class="label" style="margin:0;">Stärken</div>
+              <ul id="scoreStrengths" class="score-list"></ul>
+            </div>
+            <div>
+              <div class="label" style="margin:0;">Fehler</div>
+              <ul id="scoreMistakes" class="score-list"></ul>
+            </div>
+          </div>
+          <div id="scoreMissed" class="score-block"></div>
+          <div id="scoreNext" class="score-block"></div>
+          <div id="scoreLines" class="score-block"></div>
+          <div id="scoreMetrics" class="score-metrics"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Transkript</h2>
+        <div class="glass card">
+          <div id="transcript" class="transcript"></div>
+        </div>
+      </section>
     </div>
 
     <script type="module" src="/src/main.js"></script>
