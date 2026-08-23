@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,6 +14,7 @@
         --accent: #4f8cff;
         --danger: #ff5d5d;
         --good: #36d399;
+        --warn: #f5c542;
       }
       * { box-sizing: border-box; }
       body {
@@ -36,6 +37,8 @@
         margin-bottom: 16px;
       }
       .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; }
+      .row > div { flex: 1; min-width: 200px; }
       button {
         font-size: 14px;
         font-weight: 600;
@@ -51,32 +54,85 @@
       button:disabled { opacity: .4; cursor: not-allowed; }
       button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
       button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+      button.small { font-size: 12px; padding: 6px 10px; font-weight: 500; }
       .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 12px; }
       .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
       .dot.live { background: var(--good); box-shadow: 0 0 8px var(--good); }
-      .dot.paused { background: #f5c542; }
+      .dot.paused { background: var(--warn); }
+      .dot.ringing { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
       .label { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 8px; }
-      .transcript { height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+      .transcript { height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
       .turn { padding: 8px 12px; border-radius: 8px; max-width: 85%; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
       .turn.rep { align-self: flex-end; background: #2a3550; }
       .turn.prospect { align-self: flex-start; background: #2b2f3c; }
       .turn .who { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-      select {
+      select, textarea, input[type="text"] {
         background: #222735; color: var(--text); border: 1px solid var(--line);
         border-radius: 8px; padding: 8px; font-size: 14px; width: 100%;
+        font-family: inherit;
       }
+      textarea { min-height: 260px; font-size: 13px; line-height: 1.45; resize: vertical; }
       .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
       .err { color: var(--danger); font-size: 13px; margin-top: 10px; white-space: pre-wrap; }
+      .roletag { font-size: 12px; color: var(--muted); margin-top: 6px; }
+      .editbar { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+      .edited-badge { font-size: 11px; color: var(--warn); }
+      #editPanel { display: none; margin-top: 12px; }
+      #editPanel.open { display: block; }
+
+      /* scorecard */
+      #scorecard { display: none; }
+      #scorecard.open { display: block; }
+      .score-head { display: flex; align-items: baseline; gap: 14px; }
+      .score-num { font-size: 42px; font-weight: 700; }
+      .score-num.good { color: var(--good); }
+      .score-num.mid { color: var(--warn); }
+      .score-num.bad { color: var(--danger); }
+      .score-verdict { font-size: 14px; }
+      .score-outcome { font-size: 12px; color: var(--muted); margin-top: 2px; }
+      .score-cols { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+      .score-cols > div { flex: 1; min-width: 220px; }
+      .score-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.5; }
+      .score-block { margin-top: 12px; font-size: 13px; line-height: 1.5; }
+      .score-block b { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+      .score-metrics { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+      .metric { font-size: 12px; color: var(--muted); }
+      .metric b { display: block; font-size: 16px; color: var(--text); }
     </style>
   </head>
   <body>
     <div class="app">
       <h1>CallTrainer</h1>
-      <p class="sub">Übe ein Live-Verkaufsgespräch mit einem KI-Kunden — und höre dann deine letzte Antwort so ab, wie sie am Telefon klang.</p>
+      <p class="sub">Übe ein Live-Verkaufsgespräch mit einem KI-Kunden — mit Bewertung nach dem Anruf.</p>
 
       <div class="panel">
-        <div class="label">Szenario</div>
-        <select id="scenario"></select>
+        <div class="row">
+          <div>
+            <div class="label">Gesprächspartner</div>
+            <select id="scenario"></select>
+            <div id="roleTag" class="roletag"></div>
+          </div>
+          <div>
+            <div class="label">Schwierigkeit</div>
+            <select id="difficulty"></select>
+          </div>
+        </div>
+
+        <div class="editbar">
+          <button id="editBtn" class="small">Rolle bearbeiten</button>
+          <span id="editedBadge" class="edited-badge"></span>
+        </div>
+
+        <div id="editPanel">
+          <div class="label">Begrüßung beim Abheben</div>
+          <input type="text" id="editGreeting" />
+          <div class="label" style="margin-top:10px;">System-Prompt (inkl. verdeckter Spielregeln — frei anpassbar)</div>
+          <textarea id="editPrompt" spellcheck="false"></textarea>
+          <div class="editbar">
+            <button id="saveRoleBtn" class="small primary">Speichern</button>
+            <button id="resetRoleBtn" class="small">Auf Original zurücksetzen</button>
+          </div>
+        </div>
 
         <div class="label" style="margin-top:14px;">Mikrofon</div>
         <select id="mic"></select>
@@ -86,16 +142,41 @@
 
       <div class="panel">
         <div class="controls">
-          <button id="startBtn" class="primary">Anruf starten</button>
+          <button id="startBtn" class="primary">Anrufen</button>
           <button id="pauseBtn" disabled>Pause</button>
           <button id="replayBtn" disabled>Letzte Antwort abspielen</button>
-          <button id="endBtn" class="danger" disabled>Anruf beenden</button>
+          <button id="endBtn" class="danger" disabled>Auflegen</button>
         </div>
         <div class="status">
           <span id="dot" class="dot"></span>
           <span id="statusText">Bereit</span>
         </div>
         <div id="error" class="err"></div>
+      </div>
+
+      <div id="scorecard" class="panel">
+        <div class="label">Bewertung</div>
+        <div class="score-head">
+          <div id="scoreNum" class="score-num">–</div>
+          <div>
+            <div id="scoreVerdict" class="score-verdict"></div>
+            <div id="scoreOutcome" class="score-outcome"></div>
+          </div>
+        </div>
+        <div class="score-cols">
+          <div>
+            <b class="label">Stärken</b>
+            <ul id="scoreStrengths" class="score-list"></ul>
+          </div>
+          <div>
+            <b class="label">Fehler</b>
+            <ul id="scoreMistakes" class="score-list"></ul>
+          </div>
+        </div>
+        <div id="scoreMissed" class="score-block"></div>
+        <div id="scoreNext" class="score-block"></div>
+        <div id="scoreLines" class="score-block"></div>
+        <div id="scoreMetrics" class="score-metrics"></div>
       </div>
 
       <div class="panel">

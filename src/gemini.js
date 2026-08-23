@@ -7,6 +7,52 @@ import { GoogleGenAI, Modality } from '@google/genai';
 
 const MODEL = 'gemini-3.1-flash-live-preview';
 
+/**
+ * Ending the call and agreeing to a next step are decisions, not words, so
+ * they are tools rather than text tokens. With a speech-to-speech model a
+ * literal "[HANGUP]" in the output would simply be read out loud.
+ * (Ported from the new callTrainer.)
+ */
+export function callTools(lang) {
+  const de = lang === 'de';
+  return [{
+    functionDeclarations: [
+      {
+        name: 'end_call',
+        description: de
+          ? 'Beende das Telefonat sofort. Rufe das auf, NACHDEM du dich verabschiedet hast, wenn du keine Lust mehr hast, keine Zeit hast oder kein Interesse besteht.'
+          : 'End the phone call immediately. Call this AFTER saying goodbye, when you have lost patience, have no time, or are not interested.',
+        parameters: {
+          type: 'object',
+          properties: {
+            reason: {
+              type: 'string',
+              description: de ? 'Kurzer Grund, warum du auflegst.' : 'Short reason for hanging up.',
+            },
+          },
+          required: ['reason'],
+        },
+      },
+      {
+        name: 'agree_next_step',
+        description: de
+          ? 'Rufe das auf, wenn der Anrufer dein echtes Problem getroffen und einen konkreten nächsten Schritt vorgeschlagen hat, dem du zustimmst.'
+          : 'Call this when the caller has hit your real problem and proposed a concrete next step that you agree to.',
+        parameters: {
+          type: 'object',
+          properties: {
+            next_step: {
+              type: 'string',
+              description: de ? 'Was genau vereinbart wurde.' : 'What exactly was agreed.',
+            },
+          },
+          required: ['next_step'],
+        },
+      },
+    ],
+  }];
+}
+
 export class GeminiCall {
   constructor(apiKey) {
     this.ai = new GoogleGenAI({ apiKey });
@@ -18,6 +64,7 @@ export class GeminiCall {
       onUserText: () => {},       // (text)    => void   input transcription
       onModelText: () => {},      // (text)    => void   output transcription
       onTurnComplete: () => {},   // ()        => void
+      onToolCall: () => {},       // ({name, args}) => void  end_call / agree_next_step
       onError: () => {},          // (message) => void
       onClose: () => {},          // (reason)  => void
     };
@@ -29,13 +76,17 @@ export class GeminiCall {
     return this;
   }
 
-  async connect(systemInstructionText) {
+  async connect({ systemInstruction, voice = 'Charon', lang = 'de' }) {
     const config = {
       responseModalities: [Modality.AUDIO],
-      systemInstruction: { parts: [{ text: systemInstructionText }] },
+      systemInstruction: { parts: [{ text: systemInstruction }] },
       inputAudioTranscription: {},
       outputAudioTranscription: {},
-      speechConfig: { languageCode: 'de-DE' },
+      speechConfig: {
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } },
+        languageCode: lang === 'de' ? 'de-DE' : 'en-US',
+      },
+      tools: callTools(lang),
     };
 
     this.session = await this.ai.live.connect({
@@ -52,14 +103,39 @@ export class GeminiCall {
     return this;
   }
 
-  _handleMessage(msg) {
-    // Raw diagnostic: what is the server actually sending?
+  /**
+   * Stage direction ([REGIE]): a client text turn the model treats as
+   * instruction, not as something the caller said. Used for the pick-up
+   * greeting and the difficulty mood. turnComplete=true makes the model
+   * respond immediately — that is what produces the greeting audio.
+   */
+  sendDirective(text, { respond = true } = {}) {
+    if (!this.session) return;
     try {
-      console.debug('[CT] msg keys:', Object.keys(msg || {}),
-        '| serverContent:', msg?.serverContent ? Object.keys(msg.serverContent) : null,
-        '| setupComplete:', !!msg?.setupComplete,
-        '| toolCall:', !!msg?.toolCall);
-    } catch {}
+      this.session.sendClientContent({
+        turns: [{ role: 'user', parts: [{ text }] }],
+        turnComplete: respond,
+      });
+    } catch (e) {
+      console.debug('[CT] sendDirective failed', e);
+    }
+  }
+
+  _handleMessage(msg) {
+    // Tool calls: the prospect decided to hang up or to agree a next step.
+    if (msg.toolCall?.functionCalls?.length) {
+      for (const fc of msg.toolCall.functionCalls) {
+        console.debug('[CT] toolCall:', fc.name, fc.args);
+        // Acknowledge so the model is not left waiting on the response.
+        try {
+          this.session?.sendToolResponse({
+            functionResponses: [{ id: fc.id, name: fc.name, response: { ok: true } }],
+          });
+        } catch {}
+        this.handlers.onToolCall({ name: fc.name, args: fc.args || {} });
+      }
+      return;
+    }
 
     const content = msg.serverContent;
     if (!content) return;
