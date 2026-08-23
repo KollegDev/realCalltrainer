@@ -45,6 +45,9 @@ const els = {
   scoreNext: document.getElementById('scoreNext'),
   scoreLines: document.getElementById('scoreLines'),
   scoreMetrics: document.getElementById('scoreMetrics'),
+  consent: document.getElementById('consent'),
+  consentBtn: document.getElementById('consentBtn'),
+  reportBtn: document.getElementById('reportBtn'),
 };
 
 let call = null;
@@ -223,6 +226,13 @@ function addText(entryRef, who, fragment) {
 /* ── start call ─────────────────────────────────────────────────────────── */
 
 async function startCall() {
+  // First-run consent gate: the free Gemini tier means Google trains on the
+  // submitted audio. That has to be acknowledged before the first recording —
+  // and the disclosure text must stay while the app runs on the free tier.
+  if (localStorage.getItem(CONSENT_KEY) !== 'yes') {
+    els.consent.classList.add('open');
+    return;
+  }
   showError('');
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey || apiKey === 'paste-your-key-here') {
@@ -521,6 +531,31 @@ function renderScorecard(r, de) {
 }
 
 /* ── events ─────────────────────────────────────────────────────────────── */
+
+const CONSENT_KEY = 'ct.consent.v1';
+
+els.consentBtn.addEventListener('click', () => {
+  localStorage.setItem(CONSENT_KEY, 'yes');
+  els.consent.classList.remove('open');
+  startCall();
+});
+
+// In-app report path for offensive AI output (Play AI-content policy).
+// Opens a mail draft with the transcript; nothing is sent automatically.
+els.reportBtn.addEventListener('click', () => {
+  const role = currentRole();
+  const transcript = history
+    .filter(h => h.text.trim())
+    .map(h => `${h.role === 'user' ? 'ANRUFER' : role.name}: ${h.text}`)
+    .join('\n');
+  const body = encodeURIComponent(
+    `Ich möchte eine KI-Antwort aus einem simulierten Anruf melden.\n\n` +
+    `Rolle: ${role.name} (${role.id})\nZeit: ${new Date().toISOString()}\n\n` +
+    `--- Transkript ---\n${transcript}\n\n--- Was war anstößig? ---\n`
+  );
+  window.location.href =
+    `mailto:info@supershipper.ai?subject=${encodeURIComponent('Inhalt melden — Cold Call Trainer')}&body=${body}`;
+});
 
 els.start.addEventListener('click', startCall);
 els.pause.addEventListener('click', togglePause);

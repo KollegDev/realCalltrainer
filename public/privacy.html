@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Datenschutz – Cold Call Trainer</title>
+<meta name="robots" content="index, follow" />
+<style>
+  :root{--bg:#0b0d10;--panel:#14181d;--line:#262d36;--text:#e9edf2;--muted:#8b96a5;--accent:#33d17a;--warn:#f5a524}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:38px 20px 80px}
+  h1{font-size:27px;letter-spacing:-.02em;margin:0 0 6px}
+  h2{font-size:19px;margin:34px 0 10px;letter-spacing:-.01em}
+  h3{font-size:15px;margin:22px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  p,li{color:#d3dae3}
+  a{color:var(--accent)}
+  .meta{color:var(--muted);font-size:14px;margin:0 0 26px}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:20px 0}
+  .box.warn{border-color:#6b4a12;background:#1d1709}
+  .box.warn strong{color:var(--warn)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  .lang{display:flex;gap:8px;margin-bottom:26px}
+  .lang a{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:7px 13px;
+    text-decoration:none;color:var(--muted);font-size:13.5px}
+  .lang a.on{background:var(--accent);color:#06210f;border-color:var(--accent);font-weight:600}
+  section{display:none} section.on{display:block}
+  hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+  code{background:#1b2027;padding:2px 6px;border-radius:5px;font-size:13.5px}
+  footer{color:var(--muted);font-size:13px;margin-top:40px}
+</style>
+</head>
+<body>
+<main>
+
+<div class="lang">
+  <a href="#de" id="tabDe" class="on">Deutsch</a>
+  <a href="#en" id="tabEn">English</a>
+</div>
+
+<!-- ══════════════════════════════ DEUTSCH ══════════════════════════════ -->
+<section id="de" class="on">
+
+<h1>Datenschutzerklärung</h1>
+<p class="meta">Cold Call Trainer · Stand: 20. August 2026 · Geschlossener Test</p>
+
+<div class="box warn">
+  <strong>Das Wichtigste zuerst.</strong>
+  <p style="margin:8px 0 0">Diese App nimmt deine Stimme auf und schickt sie an Google, damit dort ein
+  KI-Modell antwortet. Der Test läuft derzeit über die kostenlose Stufe der Google-Gemini-API.
+  <strong>Auf dieser Stufe verwendet Google die übertragenen Daten – auch deine Sprachaufnahmen –
+  zur Verbesserung seiner eigenen Produkte.</strong> Wenn du damit nicht einverstanden bist,
+  benutze die App bitte nicht.</p>
+</div>
+
+<h2>1. Verantwortlicher</h2>
+<p>
+  Cold Call Trainer — Heinrich von Martens<br />
+  c/o Online-Impressum #3729<br />
+  Europaring 90<br />
+  53757 Sankt Augustin, Deutschland<br />
+  E-Mail: <a href="mailto:info@supershipper.ai">info@supershipper.ai</a>
+</p>
+<p class="meta">Diese App befindet sich in einem geschlossenen Test. Es gibt kein kommerzielles
+Angebot und keine Nutzerkonten.</p>
+
+<h2>2. Welche Daten verarbeitet werden</h2>
+
+<table>
+  <tr><th>Daten</th><th>Zweck</th><th>Wohin</th><th>Speicherdauer</th></tr>
+  <tr>
+    <td><strong>Sprachaufnahme</strong> während eines simulierten Anrufs</td>
+    <td>Damit das KI-Modell in Echtzeit antworten kann</td>
+    <td>Direkt von deinem Gerät an Google (Gemini Live API)</td>
+    <td>Nicht von uns gespeichert. Speicherung bei Google richtet sich nach deren Bedingungen.</td>
+  </tr>
+  <tr>
+    <td><strong>Transkript</strong> des Gesprächs</td>
+    <td>Auswertung nach dem Anruf</td>
+    <td>Bleibt in deinem Browser; für die Auswertung einmalig an unseren Server und weiter an Google</td>
+    <td>Wird von uns nicht gespeichert.</td>
+  </tr>
+  <tr>
+    <td><strong>Zufällige Geräte-Kennung</strong> (keine Werbe-ID, kein Fingerprint)</td>
+    <td>Missbrauch verhindern und das Kontingent fair auf alle Tester verteilen</td>
+    <td>Unser Server</td>
+    <td>Nur im Arbeitsspeicher, maximal 24 Stunden; bei jedem Neustart gelöscht.</td>
+  </tr>
+  <tr>
+    <td><strong>Deine Rollen und Prompts</strong></td>
+    <td>Deine eigenen Gesprächspartner speichern</td>
+    <td>Nur lokal in deinem Browser (<code>localStorage</code>)</td>
+    <td>Bis du sie löschst oder die Browserdaten leerst.</td>
+  </tr>
+  <tr>
+    <td><strong>Gemeldete Inhalte</strong> — nur wenn du nach einem Anruf aktiv auf „Inhalt melden" tippst</td>
+    <td>Prüfung anstößiger KI-Antworten, Verbesserung der Filter</td>
+    <td>Per E-Mail an uns (dein Mailprogramm öffnet sich; gesendet wird nur, was du selbst abschickst)</td>
+    <td>Bis zur Prüfung, längstens 90 Tage.</td>
+  </tr>
+</table>
+
+<h3>Was wir NICHT verarbeiten</h3>
+<ul>
+  <li>Keine Namen, keine E-Mail-Adressen, keine Telefonnummern</li>
+  <li>Keine Nutzerkonten, keine Anmeldung</li>
+  <li>Keine Werbe-IDs, kein Tracking, keine Analytics, keine Cookies von Dritten</li>
+  <li>Keine dauerhafte Speicherung deiner Anrufe auf unserem Server — außer Inhalten, die du selbst meldest (siehe Tabelle)</li>
+</ul>
+
+<h2>3. Weitergabe an Google</h2>
+<p>Für die Sprachausgabe und -erkennung nutzen wir die Gemini API von Google.
+Deine Audiodaten werden direkt von deinem Gerät an Google übertragen und dort verarbeitet.
+Eine Übermittlung in Drittländer, insbesondere in die USA, findet statt.</p>
+<p>Google agiert dabei nach den eigenen Bedingungen:
+<a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Gemini API – Nutzungsbedingungen</a> ·
+<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Datenschutzerklärung</a>.</p>
+<p><strong>In der kostenlosen Stufe, die dieser Test verwendet, weist Google ausdrücklich aus, dass
+übermittelte Inhalte zur Verbesserung der Google-Produkte genutzt werden.</strong> Menschliche
+Überprüfung ist dabei nicht ausgeschlossen. Sprich in dieser App daher keine echten Kundennamen,
+Preise oder andere vertraulichen Informationen aus. Erfinde für die Übung ruhige Beispiele.</p>
+
+<h2>4. Rechtsgrundlage</h2>
+<p>Die Verarbeitung deiner Sprachaufnahmen erfolgt ausschließlich auf Grundlage deiner Einwilligung
+gemäß Art. 6 Abs. 1 lit. a DSGVO. Du erteilst sie beim ersten Start der App aktiv und kannst sie
+jederzeit widerrufen, indem du die App nicht weiter nutzt und die Browserdaten löschst.
+Der Widerruf berührt die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung nicht.</p>
+<p>Die zufällige Geräte-Kennung verarbeiten wir auf Grundlage unseres berechtigten Interesses
+(Art. 6 Abs. 1 lit. f DSGVO) an einem funktionsfähigen, nicht missbrauchten Testbetrieb.</p>
+
+<h2>5. Deine Rechte</h2>
+<p>Dir stehen Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch
+zu (Art. 15–21 DSGVO) sowie ein Beschwerderecht bei einer Aufsichtsbehörde.</p>
+<p>Praktisch: Wir speichern nichts dauerhaft, was dir zugeordnet werden könnte. Alle Daten in deinem
+Browser löschst du selbst über die Browsereinstellungen. Für Daten, die bei Google liegen, wende
+dich bitte direkt an Google.</p>
+
+<h2>6. Kinder</h2>
+<p>Die App richtet sich an Erwachsene im beruflichen Kontext und ist nicht für Personen unter
+18 Jahren bestimmt.</p>
+
+<h2>7. Änderungen</h2>
+<p>Sobald der Test auf eine kostenpflichtige Stufe wechselt, entfällt die Nutzung deiner Daten für
+Google-Trainingszwecke. Diese Erklärung wird dann entsprechend aktualisiert.</p>
+
+<hr />
+<footer>Diese Erklärung wurde nach bestem Wissen erstellt und ist keine Rechtsberatung.</footer>
+
+</section>
+
+<!-- ══════════════════════════════ ENGLISH ══════════════════════════════ -->
+<section id="en">
+
+<h1>Privacy Policy</h1>
+<p class="meta">Cold Call Trainer · Last updated: 20 August 2026 · Closed test</p>
+
+<div class="box warn">
+  <strong>The important part first.</strong>
+  <p style="margin:8px 0 0">This app records your voice and sends it to Google so an AI model can
+  reply. The test currently runs on the free tier of the Google Gemini API.
+  <strong>On that tier, Google states that transmitted content — including your voice recordings —
+  is used to improve Google's own products.</strong> If you are not comfortable with that,
+  please do not use the app.</p>
+</div>
+
+<h2>1. Controller</h2>
+<p>Cold Call Trainer — Heinrich von Martens<br />
+c/o Online-Impressum #3729<br />
+Europaring 90<br />
+53757 Sankt Augustin, Germany<br />
+Email: <a href="mailto:info@supershipper.ai">info@supershipper.ai</a></p>
+<p class="meta">This app is in closed testing. There is no commercial offering and there are no user accounts.</p>
+
+<h2>2. What is processed</h2>
+<table>
+  <tr><th>Data</th><th>Purpose</th><th>Where it goes</th><th>Retention</th></tr>
+  <tr>
+    <td><strong>Voice recording</strong> during a simulated call</td>
+    <td>So the AI model can respond in real time</td>
+    <td>Directly from your device to Google (Gemini Live API)</td>
+    <td>Not stored by us. Google's retention follows their terms.</td>
+  </tr>
+  <tr>
+    <td><strong>Call transcript</strong></td>
+    <td>The post-call scorecard</td>
+    <td>Stays in your browser; sent once to our server and on to Google for grading</td>
+    <td>Not stored by us.</td>
+  </tr>
+  <tr>
+    <td><strong>Random device id</strong> (not an advertising id, not a fingerprint)</td>
+    <td>Abuse prevention and sharing the daily quota fairly between testers</td>
+    <td>Our server</td>
+    <td>In memory only, at most 24 hours, cleared on every restart.</td>
+  </tr>
+  <tr>
+    <td><strong>Your roles and prompts</strong></td>
+    <td>Saving your own prospects</td>
+    <td>Your browser only (<code>localStorage</code>)</td>
+    <td>Until you delete them or clear browser data.</td>
+  </tr>
+  <tr>
+    <td><strong>Reported content</strong> — only when you actively tap "Report content" after a call</td>
+    <td>Reviewing offensive AI replies, improving filters</td>
+    <td>By e-mail to us (your mail client opens; only what you send yourself is transmitted)</td>
+    <td>Until reviewed, at most 90 days.</td>
+  </tr>
+</table>
+
+<h3>What we do NOT process</h3>
+<ul>
+  <li>No names, email addresses or phone numbers</li>
+  <li>No accounts, no sign-in</li>
+  <li>No advertising ids, no tracking, no analytics, no third-party cookies</li>
+  <li>No permanent storage of your calls on our server — except content you report yourself (see table)</li>
+</ul>
+
+<h2>3. Transfer to Google</h2>
+<p>Speech recognition and generation use Google's Gemini API. Your audio goes directly from your
+device to Google and is processed there, including transfers outside the EU, in particular to the
+United States.</p>
+<p>Google acts under its own terms:
+<a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Gemini API Terms</a> ·
+<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
+<p><strong>On the free tier used by this test, Google explicitly states that submitted content is used
+to improve Google's products</strong>, and human review is not excluded. Please do not say real
+customer names, prices or other confidential information while using the app. Invent your examples.</p>
+
+<h2>4. Legal basis</h2>
+<p>Voice processing is based solely on your consent under Art. 6(1)(a) GDPR. You give it actively on
+first launch and can withdraw it at any time by discontinuing use and clearing browser data.
+Withdrawal does not affect the lawfulness of processing carried out beforehand.</p>
+<p>The random device id is processed under legitimate interest, Art. 6(1)(f) GDPR, in keeping the
+test functional and free from abuse.</p>
+
+<h2>5. Your rights</h2>
+<p>You have the rights of access, rectification, erasure, restriction, portability and objection
+(Art. 15–21 GDPR), and may lodge a complaint with a supervisory authority.</p>
+<p>In practice: we store nothing permanently that could be linked to you. Everything in your browser
+you delete yourself. For data held by Google, please contact Google directly.</p>
+
+<h2>6. Children</h2>
+<p>The app is aimed at adults in a professional context and is not intended for anyone under 18.</p>
+
+<h2>7. Changes</h2>
+<p>Once the test moves to a paid tier, the use of your data for Google training purposes no longer
+applies. This policy will be updated accordingly.</p>
+
+<hr />
+<footer>Written in good faith. This is not legal advice.</footer>
+
+</section>
+
+<!-- External, not inline: the CSP has no 'unsafe-inline' and no hashes, so an
+     inline script silently never runs in production. -->
+<script src="/src/privacy.js"></script>
+
+</main>
+</body>
+</html>

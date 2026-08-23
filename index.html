@@ -217,6 +217,29 @@
         button { transition: none; }
         button:active:not(:disabled) { transform: none; }
       }
+
+      /* ——— First-run consent overlay ——— */
+      #consent {
+        position: fixed; inset: 0; z-index: 50;
+        display: none; align-items: center; justify-content: center;
+        background: rgba(243, 244, 248, 0.75);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        padding: 20px;
+      }
+      #consent.open { display: flex; }
+      .consent-modal { max-width: 480px; padding: 28px 30px; }
+      .consent-modal h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); text-transform: none; }
+      .consent-modal p { margin: 0 0 12px; font-size: 14px; line-height: 21px; }
+      .consent-warn {
+        background: rgba(217, 161, 59, 0.12);
+        border: 1px solid rgba(217, 161, 59, 0.35);
+        border-radius: 12px; padding: 12px 14px; margin: 12px 0;
+        font-size: 14px; line-height: 21px;
+      }
+      .consent-warn strong { color: #9a7015; }
+      .consent-list { margin: 0 0 14px; padding-left: 18px; font-size: 14px; line-height: 1.6; }
+      .consent-age { font-size: 12px; color: var(--muted); margin-top: 10px; }
     </style>
   </head>
   <body>
@@ -312,6 +335,9 @@
           <div id="scoreNext" class="score-block"></div>
           <div id="scoreLines" class="score-block"></div>
           <div id="scoreMetrics" class="score-metrics"></div>
+          <div class="editbar" style="justify-content:flex-start;">
+            <button id="reportBtn" class="small">Inhalt melden</button>
+          </div>
         </div>
       </section>
 
@@ -321,6 +347,25 @@
           <div id="transcript" class="transcript"></div>
         </div>
       </section>
+    </div>
+
+    <div id="consent">
+      <div class="glass consent-modal">
+        <h2>Bevor es losgeht</h2>
+        <p>Diese App nimmt deine Stimme auf, damit der simulierte Gesprächspartner in Echtzeit antworten kann.</p>
+        <div class="consent-warn">
+          <strong>Wichtig im Testbetrieb</strong><br />
+          Der Test läuft über die kostenlose Stufe der Google-Gemini-API. Google nutzt die übertragenen Daten – auch deine Sprachaufnahmen – zur Verbesserung eigener Produkte. Sag deshalb keine echten Kundennamen, Preise oder vertraulichen Angaben. Denk dir Beispiele aus.
+        </div>
+        <ul class="consent-list">
+          <li>Wir speichern deine Anrufe nicht auf unserem Server.</li>
+          <li>Kein Konto, keine Anmeldung, kein Tracking.</li>
+          <li>Deine Rollenänderungen bleiben nur in diesem Browser.</li>
+        </ul>
+        <p><a href="/privacy.html" target="_blank" rel="noopener">Vollständige Datenschutzerklärung</a></p>
+        <button id="consentBtn" class="primary">Ich bin einverstanden und benutze nur erfundene Beispiele</button>
+        <div class="consent-age">Ab 18 Jahren.</div>
+      </div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
