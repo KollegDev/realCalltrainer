@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.calltrainer.twa",
+        "sha256_cert_fingerprints": ["15:E5:38:82:F8:2E:B7:46:8C:38:EE:2B:B7:30:90:43:25:1C:5A:FC:15:49:08:16:13:A4:58:A6:DE:39:41:37"]
+      }
+    }]

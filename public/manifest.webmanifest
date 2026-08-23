@@ -1,0 +1,29 @@
+{
+  "name": "Cold Call Trainer",
+  "short_name": "CallTrainer",
+  "description": "Kaltakquise am Telefon üben. Du rufst an, der Kunde ist genervt und kann auflegen. Danach bekommst du eine Auswertung. Deutsch und Englisch.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f4f8",
+  "theme_color": "#f3f4f8",
+  "lang": "de",
+  "dir": "ltr",
+  "categories": ["education", "business", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Letzte Rolle anrufen",
+      "short_name": "Anrufen",
+      "url": "/?action=call",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

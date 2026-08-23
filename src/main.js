@@ -529,3 +529,9 @@ els.end.addEventListener('click', endCall);
 
 setStatus('Bereit');
 setControls({ start: true, pause: false, replay: false, end: false });
+
+// PWA: register the service worker in production builds only — a SW in dev
+// serves stale modules and turns every change into a caching mystery.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch((e) => console.debug('[CT] sw register failed', e));
+}
