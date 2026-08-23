@@ -89,6 +89,13 @@ export class GeminiCall {
       tools: callTools(lang),
     };
 
+    // The SDK's connect() resolves when the socket is open and the setup
+    // frame is SENT — not when the server has processed it. A clientContent
+    // sent before setupComplete is silently dropped, which is how the
+    // greeting directive got eaten. Wait for setupComplete ourselves.
+    this._readyResolve = null;
+    const ready = new Promise((resolve) => { this._readyResolve = resolve; });
+
     this.session = await this.ai.live.connect({
       model: MODEL,
       config,
@@ -99,6 +106,12 @@ export class GeminiCall {
         onclose: (e) => { console.debug('[CT] live close', e?.code, e?.reason); this.handlers.onClose(e?.reason || ''); },
       },
     });
+
+    await Promise.race([
+      ready,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Server hat das Setup nicht bestätigt (setupComplete timeout)')), 10000)),
+    ]);
 
     return this;
   }
@@ -122,6 +135,13 @@ export class GeminiCall {
   }
 
   _handleMessage(msg) {
+    // Server finished processing our setup — now it is safe to send content.
+    if (msg.setupComplete) {
+      this._readyResolve && this._readyResolve();
+      this._readyResolve = null;
+      return;
+    }
+
     // Tool calls: the prospect decided to hang up or to agree a next step.
     if (msg.toolCall?.functionCalls?.length) {
       for (const fc of msg.toolCall.functionCalls) {

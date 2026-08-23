@@ -54,6 +54,12 @@ let ring = null;
 let paused = false;
 let ending = false; // re-entrancy guard: prospect hangup + user hangup racing
 
+// Mic gate during the pick-up greeting. Two reasons: the caller should not
+// talk over the ring, and — without headphones — the greeting's own echo
+// would trip the server VAD as a barge-in and cut the greeting off.
+let awaitingGreeting = false;
+let greetWatchdog = null; // cleared in onTurnComplete and teardown
+
 // Call report state.
 let history = [];              // [{ role:'user'|'model', text, t }]
 let interruptionsByUser = 0;
@@ -234,6 +240,7 @@ async function startCall() {
   outcome = null;
   agreedStep = '';
   ending = false;
+  awaitingGreeting = true;
   repEntry = { value: null };
   prospectEntry = { value: null };
   els.transcript.innerHTML = '';
@@ -258,10 +265,15 @@ async function startCall() {
         player && player.enqueue(b64);
       },
       onModelTurnStart: () => {
+        // First voice = the prospect picked up. Stop the ring exactly here —
+        // this handler runs before the first audio chunk is enqueued, so ring
+        // and voice can never overlap.
+        if (ring) { ring.stop(); ring = null; }
         // The prospect started replying => the user's turn just ended. Snapshot it.
         recorder && recorder.snapshotTurn();
         window.__ct.snapshots++;
-        els.replay.disabled = false;
+        // No replay for the empty pre-greeting buffer; enable from then on.
+        els.replay.disabled = awaitingGreeting;
         prospectEntry.value = null; // start a fresh prospect bubble
       },
       onInterrupted: () => {
@@ -270,7 +282,17 @@ async function startCall() {
       },
       onUserText: (t) => addText(repEntry, 'rep', t),
       onModelText: (t) => addText(prospectEntry, 'prospect', t),
-      onTurnComplete: () => { repEntry.value = null; },
+      onTurnComplete: () => {
+        repEntry.value = null;
+        // Greeting finished — open the mic and go live.
+        if (awaitingGreeting) {
+          awaitingGreeting = false;
+          if (greetWatchdog) { clearTimeout(greetWatchdog); greetWatchdog = null; }
+          callStartedAt = Date.now();
+          setStatus('Live — sprich los', 'live');
+          setControls({ start: false, pause: true, replay: false, end: true });
+        }
+      },
       onToolCall: ({ name, args }) => {
         if (name === 'agree_next_step') {
           outcome = 'sale';
@@ -285,17 +307,12 @@ async function startCall() {
       onClose: (r) => { if (r && !ending) showError('Verbindung getrennt: ' + r); },
     });
 
-    await call.connect({ systemInstruction: role.prompt, voice: role.voice, lang: role.lang });
-
-    // Connected: stop ringing, direct the prospect to pick up and set the mood.
-    ring.stop(); ring = null;
-    call.sendDirective(de
-      ? `[REGIE — nicht vorlesen] Du hast gerade abgenommen. Melde dich genau so und nur so: "${role.greeting}". Sag sonst nichts. Deine Laune heute: ${diff.de}`
-      : `[STAGE DIRECTION — do not read out] You have just picked up. Answer exactly and only with: "${role.greeting}". Say nothing else. Your mood today: ${diff.en}`);
-
+    // Mic first, while it "rings": the permission prompt happens under the
+    // ring tone instead of delaying the greeting. Chunks are gated — nothing
+    // is sent until the greeting has finished (awaitingGreeting).
     await recorder.start(
       (b64) => {
-        if (!paused && call) {
+        if (!paused && !awaitingGreeting && call) {
           call.sendAudio(b64);
           window.__ct.sent++;
         }
@@ -304,10 +321,25 @@ async function startCall() {
     );
     populateMics(); // refresh labels now that permission is granted
 
-    callStartedAt = Date.now();
+    // connect() resolves only after the server confirmed setupComplete, so
+    // the greeting directive below cannot be dropped anymore.
+    await call.connect({ systemInstruction: role.prompt, voice: role.voice, lang: role.lang });
+
+    call.sendDirective(de
+      ? `[REGIE — nicht vorlesen] Du hast gerade abgenommen. Melde dich genau so und nur so: "${role.greeting}". Sag sonst nichts. Deine Laune heute: ${diff.de}`
+      : `[STAGE DIRECTION — do not read out] You have just picked up. Answer exactly and only with: "${role.greeting}". Say nothing else. Your mood today: ${diff.en}`);
+
+    // The ring keeps ringing until the first greeting audio arrives
+    // (stopped in onModelTurnStart). Status flips to Live in onTurnComplete.
+    // If no greeting arrives at all, don't ring forever.
+    greetWatchdog = setTimeout(() => {
+      if (awaitingGreeting && !ending) {
+        showError('Keine Antwort vom Modell — Anruf abgebrochen.');
+        endCall();
+      }
+    }, 15000);
     paused = false;
-    setStatus('Live — sprich los', 'live');
-    setControls({ start: false, pause: true, replay: false, end: true });
+    setControls({ start: false, pause: false, replay: false, end: true });
   } catch (err) {
     console.error(err);
     showError('Start fehlgeschlagen: ' + (err?.message || err));
@@ -361,6 +393,8 @@ async function replayLast() {
 async function endByProspect(reason) {
   if (ending) return;
   ending = true;
+  if (ring) { ring.stop(); ring = null; }
+  awaitingGreeting = false;
   setControls({ start: false, pause: false, replay: false, end: false });
   setStatus('Aufgelegt' + (reason ? ` — ${reason}` : ''), '');
   try { recorder && (await recorder.stop()); } catch {}
@@ -390,6 +424,9 @@ async function endCall() {
 }
 
 async function teardown() {
+  if (ring) { ring.stop(); ring = null; }
+  if (greetWatchdog) { clearTimeout(greetWatchdog); greetWatchdog = null; }
+  awaitingGreeting = false;
   try { recorder && (await recorder.stop()); } catch {}
   try { player && (await player.close()); } catch {}
   try { call && call.close(); } catch {}
