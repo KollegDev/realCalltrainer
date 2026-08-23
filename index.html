@@ -5,99 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CallTrainer — Verkaufsgespräch üben</title>
     <style>
+      /* ── Liquid glass on warm off-white ──────────────────────────────────
+         Translucent, blurred panels over a soft, warm background with faint
+         colour-tint glows. Centered, symmetric, calm. Text #333 for warmth
+         and trust instead of hard black. */
       :root {
-        --bg: #0f1117;
-        --panel: #181b24;
-        --line: #262b38;
-        --text: #e7e9ee;
-        --muted: #9aa3b2;
-        --accent: #4f8cff;
-        --danger: #ff5d5d;
-        --good: #36d399;
-        --warn: #f5c542;
+        --bg: #f6f3ee;            /* warm off-white */
+        --text: #333333;
+        --muted: #8b867c;
+        --accent: #5b8def;
+        --accent-soft: rgba(91, 141, 239, 0.14);
+        --danger: #e2574f;
+        --danger-soft: rgba(226, 87, 79, 0.12);
+        --good: #2fa47c;
+        --warn: #d9a13b;
+        --glass: rgba(255, 255, 255, 0.55);
+        --glass-strong: rgba(255, 255, 255, 0.72);
+        --glass-border: rgba(255, 255, 255, 0.65);
+        --glass-inner: rgba(255, 255, 255, 0.35);
+        --shadow: 0 18px 40px -18px rgba(91, 141, 239, 0.25),
+                  0 8px 24px -12px rgba(51, 51, 51, 0.10);
       }
       * { box-sizing: border-box; }
+      html, body { min-height: 100%; }
       body {
         margin: 0;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         background: var(--bg);
         color: var(--text);
         display: flex;
         justify-content: center;
-        padding: 24px;
+        padding: 40px 20px 64px;
+        position: relative;
+        overflow-x: hidden;
       }
-      .app { width: 100%; max-width: 720px; }
-      h1 { font-size: 20px; margin: 0 0 4px; }
-      .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+      /* Faint colour-tint glows behind the glass — the "light through the
+         pane" effect. Fixed, symmetric, non-interactive. */
+      body::before, body::after {
+        content: '';
+        position: fixed;
+        z-index: -1;
+        width: 60vmax;
+        height: 60vmax;
+        border-radius: 50%;
+        filter: blur(90px);
+        pointer-events: none;
+      }
+      body::before {
+        top: -25vmax;
+        left: 50%;
+        transform: translateX(-85%);
+        background: radial-gradient(circle,
+          rgba(91, 141, 239, 0.18), rgba(91, 141, 239, 0) 65%);
+      }
+      body::after {
+        bottom: -30vmax;
+        left: 50%;
+        transform: translateX(-15%);
+        background: radial-gradient(circle,
+          rgba(240, 176, 122, 0.20), rgba(240, 176, 122, 0) 65%);
+      }
+
+      .app { width: 100%; max-width: 680px; }
+
+      h1 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0 0 6px;
+        text-align: center;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0 auto 28px;
+        text-align: center;
+        max-width: 46ch;
+      }
+
       .panel {
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 16px;
+        background: var(--glass);
+        backdrop-filter: blur(22px) saturate(1.5);
+        -webkit-backdrop-filter: blur(22px) saturate(1.5);
+        border: 1px solid var(--glass-border);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        margin-bottom: 20px;
       }
-      .controls { display: flex; gap: 10px; flex-wrap: wrap; }
-      .row { display: flex; gap: 10px; flex-wrap: wrap; }
-      .row > div { flex: 1; min-width: 200px; }
+
+      .label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .09em;
+        color: var(--muted);
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      .row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+      .row > div { flex: 1; min-width: 210px; }
+
+      select, textarea, input[type="text"] {
+        background: var(--glass-inner);
+        color: var(--text);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+        width: 100%;
+        font-family: inherit;
+        text-align: center;
+        text-align-last: center;
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+      }
+      textarea { text-align: left; min-height: 260px; font-size: 13px; line-height: 1.5; resize: vertical; }
+      select:focus, textarea:focus, input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+
       button {
         font-size: 14px;
         font-weight: 600;
-        padding: 10px 16px;
-        border-radius: 8px;
-        border: 1px solid var(--line);
-        background: #222735;
+        padding: 11px 20px;
+        border-radius: 999px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass-strong);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         color: var(--text);
         cursor: pointer;
-        transition: filter .15s;
+        transition: transform .12s, box-shadow .15s, background .15s;
+        box-shadow: 0 6px 18px -10px rgba(51, 51, 51, 0.25);
       }
-      button:hover:not(:disabled) { filter: brightness(1.2); }
-      button:disabled { opacity: .4; cursor: not-allowed; }
-      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-      button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
-      button.small { font-size: 12px; padding: 6px 10px; font-weight: 500; }
-      .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 12px; }
-      .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
-      .dot.live { background: var(--good); box-shadow: 0 0 8px var(--good); }
+      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 22px -10px rgba(51,51,51,.3); }
+      button:active:not(:disabled) { transform: translateY(0); }
+      button:disabled { opacity: .38; cursor: not-allowed; }
+      button.primary {
+        background: linear-gradient(140deg, #6a9bf5, var(--accent));
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 10px 26px -10px rgba(91, 141, 239, 0.55);
+      }
+      button.danger {
+        background: linear-gradient(140deg, #ec6f66, var(--danger));
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 10px 26px -10px rgba(226, 87, 79, 0.5);
+      }
+      button.small { font-size: 12px; padding: 7px 14px; font-weight: 500; }
+
+      .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+      .status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 14px;
+      }
+      .dot { width: 10px; height: 10px; border-radius: 50%; background: #c9c4ba; }
+      .dot.live { background: var(--good); box-shadow: 0 0 10px rgba(47, 164, 124, .6); }
       .dot.paused { background: var(--warn); }
-      .dot.ringing { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-      .label { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 8px; }
-      .transcript { height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-      .turn { padding: 8px 12px; border-radius: 8px; max-width: 85%; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
-      .turn.rep { align-self: flex-end; background: #2a3550; }
-      .turn.prospect { align-self: flex-start; background: #2b2f3c; }
-      .turn .who { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-      select, textarea, input[type="text"] {
-        background: #222735; color: var(--text); border: 1px solid var(--line);
-        border-radius: 8px; padding: 8px; font-size: 14px; width: 100%;
-        font-family: inherit;
-      }
-      textarea { min-height: 260px; font-size: 13px; line-height: 1.45; resize: vertical; }
-      .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
-      .err { color: var(--danger); font-size: 13px; margin-top: 10px; white-space: pre-wrap; }
-      .roletag { font-size: 12px; color: var(--muted); margin-top: 6px; }
-      .editbar { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+      .dot.ringing { background: var(--accent); box-shadow: 0 0 10px var(--accent-soft); }
+
+      .roletag { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; }
+      .editbar { display: flex; gap: 10px; margin-top: 12px; align-items: center; justify-content: center; }
       .edited-badge { font-size: 11px; color: var(--warn); }
-      #editPanel { display: none; margin-top: 12px; }
+      #editPanel { display: none; margin-top: 14px; }
       #editPanel.open { display: block; }
+
+      .hint { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; }
+      .err { color: var(--danger); font-size: 13px; margin-top: 12px; white-space: pre-wrap; text-align: center; }
+
+      .transcript { height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
+      .turn {
+        padding: 9px 13px;
+        border-radius: 14px;
+        max-width: 85%;
+        font-size: 14px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      .turn.rep { align-self: flex-end; background: var(--accent-soft); border-bottom-right-radius: 5px; }
+      .turn.prospect { align-self: flex-start; background: var(--glass-strong); border-bottom-left-radius: 5px; }
+      .turn .who { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
 
       /* scorecard */
       #scorecard { display: none; }
       #scorecard.open { display: block; }
-      .score-head { display: flex; align-items: baseline; gap: 14px; }
-      .score-num { font-size: 42px; font-weight: 700; }
+      .score-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; }
+      .score-num { font-size: 52px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
       .score-num.good { color: var(--good); }
       .score-num.mid { color: var(--warn); }
       .score-num.bad { color: var(--danger); }
-      .score-verdict { font-size: 14px; }
-      .score-outcome { font-size: 12px; color: var(--muted); margin-top: 2px; }
-      .score-cols { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+      .score-verdict { font-size: 14px; max-width: 52ch; }
+      .score-outcome { font-size: 12px; color: var(--muted); }
+      .score-cols { display: flex; gap: 18px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
       .score-cols > div { flex: 1; min-width: 220px; }
-      .score-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.5; }
-      .score-block { margin-top: 12px; font-size: 13px; line-height: 1.5; }
-      .score-block b { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
-      .score-metrics { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
-      .metric { font-size: 12px; color: var(--muted); }
-      .metric b { display: block; font-size: 16px; color: var(--text); }
+      .score-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.55; }
+      .score-block { margin-top: 14px; font-size: 13px; line-height: 1.55; text-align: center; }
+      .score-block b { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; }
+      .score-metrics {
+        display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+        margin-top: 18px; padding-top: 16px;
+        border-top: 1px solid var(--glass-border);
+      }
+      .metric { font-size: 12px; color: var(--muted); text-align: center; }
+      .metric b { display: block; font-size: 17px; color: var(--text); }
     </style>
   </head>
   <body>
@@ -126,7 +249,7 @@
         <div id="editPanel">
           <div class="label">Begrüßung beim Abheben</div>
           <input type="text" id="editGreeting" />
-          <div class="label" style="margin-top:10px;">System-Prompt (inkl. verdeckter Spielregeln — frei anpassbar)</div>
+          <div class="label" style="margin-top:12px;">System-Prompt (inkl. verdeckter Spielregeln — frei anpassbar)</div>
           <textarea id="editPrompt" spellcheck="false"></textarea>
           <div class="editbar">
             <button id="saveRoleBtn" class="small primary">Speichern</button>
@@ -134,7 +257,7 @@
           </div>
         </div>
 
-        <div class="label" style="margin-top:14px;">Mikrofon</div>
+        <div class="label" style="margin-top:18px;">Mikrofon</div>
         <select id="mic"></select>
         <div id="micMeter" class="hint">Mikrofonpegel: <span id="micLevel">—</span></div>
         <div class="hint">Tipp: Nutze Kopfhörer, damit die KI sich nicht selbst hört. Wähle oben dein echtes Mikrofon (kein virtuelles/VR-Gerät).</div>
