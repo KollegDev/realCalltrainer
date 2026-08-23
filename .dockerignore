@@ -1,0 +1,9 @@
+# .env holds a REAL key — it must never enter the build context.
+# (Railway builds from the GitHub repo, which excludes it anyway; this
+# guards local docker builds.)
+.env
+node_modules
+dist
+*.rar
+.git
+push.bat
