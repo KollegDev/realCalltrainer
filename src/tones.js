@@ -40,9 +40,11 @@ function tone(ctx, dest, { on, off, gain = 0.08 }) {
   };
 }
 
-/** Ringing while the "call" connects. Caller must stop() it. */
+/** Ringing while the "call" connects. Caller must stop() it.
+ *  Cadence tightened from the 1s/4s network standard to 1s/2.5s so a second
+ *  ring is audible within the ~3s minimum ring window before pick-up. */
 export function startRing(ctx, dest = ctx.destination) {
-  return tone(ctx, dest, { on: 1.0, off: 4.0 });
+  return tone(ctx, dest, { on: 1.0, off: 2.5 });
 }
 
 /**

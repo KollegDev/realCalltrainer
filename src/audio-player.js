@@ -24,7 +24,12 @@ export class AudioPlayer {
     src.connect(this.ctx.destination);
 
     const now = this.ctx.currentTime;
-    const startAt = Math.max(now, this.nextStartTime);
+    // Jitter lead-in: when a fresh stream starts (or the queue has starved),
+    // schedule the first chunk slightly in the future. Without this buffer,
+    // network jitter between the first chunks lands exactly on the playhead
+    // and swallows syllables mid-word.
+    const LEAD = 0.12;
+    const startAt = this.nextStartTime > now ? this.nextStartTime : now + LEAD;
     src.start(startAt);
     this.nextStartTime = startAt + buffer.duration;
 

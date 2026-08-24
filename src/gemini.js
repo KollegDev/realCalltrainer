@@ -86,6 +86,16 @@ export class GeminiCall {
         voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } },
         languageCode: lang === 'de' ? 'de-DE' : 'en-US',
       },
+      // Less trigger-happy barge-in: with the default sensitivity, speaker
+      // echo or room noise registers as the caller speaking, the server sends
+      // `interrupted`, and the prospect's reply is cut off mid-sentence —
+      // heard as "swallowed" speech. LOW start sensitivity keeps real
+      // interruptions working but ignores quiet bleed.
+      realtimeInputConfig: {
+        automaticActivityDetection: {
+          startOfSpeechSensitivity: 'START_SENSITIVITY_LOW',
+        },
+      },
       tools: callTools(lang),
     };
 

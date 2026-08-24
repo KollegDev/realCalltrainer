@@ -415,6 +415,7 @@ async function startCall() {
     player = new AudioPlayer();
     await player.resume();
     ring = startRing(player.ctx);
+    const ringStartedAt = Date.now();
     setStatus(t('stRinging'), 'ringing');
 
     recorder = new AudioRecorder();
@@ -483,6 +484,12 @@ async function startCall() {
     // connect() resolves only after the server confirmed setupComplete, so
     // the greeting directive below cannot be dropped.
     await call.connect({ systemInstruction: role.prompt, voice: role.voice, lang: role.lang });
+
+    // Let it ring for at least ~3 seconds before the prospect picks up —
+    // instant pick-up feels wrong and cuts the ring after a fraction.
+    const ringLeft = 3000 - (Date.now() - ringStartedAt);
+    if (ringLeft > 0) await new Promise((r) => setTimeout(r, ringLeft));
+    if (ending || !call) return; // user hung up while it was still ringing
 
     call.sendDirective(de
       ? `[REGIE — nicht vorlesen] Du hast gerade abgenommen. Melde dich genau so und nur so: "${role.greeting}". Sag sonst nichts. Deine Laune heute: ${diff.de}`
