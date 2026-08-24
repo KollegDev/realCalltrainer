@@ -338,6 +338,15 @@ function setStatus(text, state) {
 }
 function showError(msg) { els.error.textContent = msg || ''; }
 
+// All four buttons stay visible (like the original version); only their
+// enabled state changes with the call phase.
+function setControls({ start, pause, replay, end }) {
+  els.start.disabled = !start;
+  els.pause.disabled = !pause;
+  els.replay.disabled = !replay;
+  els.end.disabled = !end;
+}
+
 function appendTurn(who, text) {
   const div = document.createElement('div');
   div.className = 'turn ' + who;
@@ -349,6 +358,7 @@ function appendTurn(who, text) {
   div.appendChild(label);
   div.appendChild(body);
   els.transcript.appendChild(div);
+  els.transcript.scrollTop = els.transcript.scrollHeight;
   const rec = { role: who === 'rep' ? 'user' : 'model', text, t: Date.now() };
   history.push(rec);
   return { el: body, rec };
@@ -359,6 +369,7 @@ function addText(entryRef, who, fragment) {
   if (!entry) entry = entryRef.value = appendTurn(who, '');
   entry.rec.text += fragment;
   entry.el.textContent = entry.rec.text;
+  els.transcript.scrollTop = els.transcript.scrollHeight;
 }
 
 /* ── start call ─────────────────────────────────────────────────────────── */
@@ -397,9 +408,7 @@ async function startCall() {
   closeOverlay(els.menuOverlay);
 
   setPhase('call');
-  els.pause.disabled = true;
-  els.replay.disabled = true;
-  els.end.disabled = false;
+  setControls({ start: false, pause: false, replay: false, end: true });
   setStatus(t('stDialing'), 'ringing');
 
   try {
@@ -543,7 +552,7 @@ async function endByProspect(reason) {
   ending = true;
   if (ring) { ring.stop(); ring = null; }
   awaitingGreeting = false;
-  els.end.disabled = true;
+  setControls({ start: false, pause: false, replay: false, end: false });
   setStatus(t('stHungup') + (reason ? ` — ${reason}` : ''), '');
   try { recorder && (await recorder.stop()); } catch {}
   try { call && call.close(); } catch {}
@@ -556,7 +565,7 @@ async function endByProspect(reason) {
   paused = false;
   els.pause.textContent = t('pause');
   setPhase('idle');
-  els.end.disabled = false;
+  setControls({ start: true, pause: false, replay: false, end: false });
   await grade();
 }
 
@@ -567,6 +576,7 @@ async function endCall() {
   if (outcome === null) outcome = 'hangup_user';
   await teardown();
   setPhase('idle');
+  setControls({ start: true, pause: false, replay: false, end: false });
   setStatus(t('stEnded'), '');
   els.pause.textContent = t('pause');
   await grade();
