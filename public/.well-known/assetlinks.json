@@ -3,6 +3,9 @@
       "target": {
         "namespace": "android_app",
         "package_name": "app.calltrainer.twa",
-        "sha256_cert_fingerprints": ["15:E5:38:82:F8:2E:B7:46:8C:38:EE:2B:B7:30:90:43:25:1C:5A:FC:15:49:08:16:13:A4:58:A6:DE:39:41:37"]
+        "sha256_cert_fingerprints": [
+          "F5:D2:18:EA:07:08:83:B5:7F:3E:3C:89:AD:08:BF:51:B5:D9:8C:31:F5:21:B0:06:E6:77:7F:C4:D6:86:A6:7B",
+          "15:E5:38:82:F8:2E:B7:46:8C:38:EE:2B:B7:30:90:43:25:1C:5A:FC:15:49:08:16:13:A4:58:A6:DE:39:41:37"
+        ]
       }
     }]
