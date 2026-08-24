@@ -21,6 +21,7 @@ const STR = {
   de: {
     replay: 'Letzte Antwort abspielen',
     pause: 'Pause', resume: 'Fortsetzen',
+    callLabel: 'Anrufen', endLabel: 'Auflegen', gearCaption: 'Einstellungen',
     cfgTitle: 'Szenario', cfgRole: 'Gesprächspartner', cfgDiff: 'Schwierigkeit',
     cfgEdit: 'Rolle bearbeiten', cfgGreeting: 'Begrüßung beim Abheben',
     cfgPrompt: 'System-Prompt (inkl. verdeckter Spielregeln — frei anpassbar)',
@@ -65,6 +66,7 @@ const STR = {
   en: {
     replay: 'Replay my last answer',
     pause: 'Pause', resume: 'Resume',
+    callLabel: 'Call', endLabel: 'Hang up', gearCaption: 'Settings',
     cfgTitle: 'Scenario', cfgRole: 'Prospect', cfgDiff: 'Difficulty',
     cfgEdit: 'Edit role', cfgGreeting: 'Greeting on pick-up',
     cfgPrompt: 'System prompt (incl. hidden rules — fully editable)',
@@ -122,7 +124,7 @@ const els = {
   configOverlay: $('configOverlay'), menuOverlay: $('menuOverlay'),
   introOverlay: $('introOverlay'), consent: $('consent'), scoreOverlay: $('scoreOverlay'),
   scenario: $('scenario'), cfgRoleTag: $('cfgRoleTag'), editedBadge: $('editedBadge'),
-  difficulty: $('difficulty'), editPanel: $('editPanel'),
+  difficulty: $('difficulty'),
   editGreeting: $('editGreeting'), editPrompt: $('editPrompt'),
   saveRoleBtn: $('saveRoleBtn'), resetRoleBtn: $('resetRoleBtn'),
   miIntro: $('miIntro'), langDe: $('langDe'), langEn: $('langEn'),
