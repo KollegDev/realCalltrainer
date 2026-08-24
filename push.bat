@@ -1,8 +1,8 @@
 @echo off
 setlocal EnableDelayedExpansion
-title oldCalltrainer - commit and push
+title realCalltrainer - commit and push
 
-set "PROJ=C:\Users\Dell\Downloads\Projekte\callTrainer\oldCalltrainer"
+set "PROJ=C:\Users\Dell\Downloads\Projekte\callTrainer\realCalltrainer"
 if exist "%~dp0package.json" set "PROJ=%~dp0"
 cd /d "%PROJ%"
 
@@ -17,8 +17,8 @@ if errorlevel 1 (
 
 echo.
 echo   ============================================================
-echo     oldCalltrainer - push to GitHub
-echo     https://github.com/KollegDev/oldCalltrainer
+echo     realCalltrainer - push to GitHub
+echo     https://github.com/KollegDev/realCalltrainer
 echo   ============================================================
 echo.
 
@@ -97,6 +97,6 @@ if !errorlevel! neq 0 (
 )
 
 echo.
-echo   Pushed to https://github.com/KollegDev/oldCalltrainer
+echo   Pushed to https://github.com/KollegDev/realCalltrainer
 echo.
 pause
