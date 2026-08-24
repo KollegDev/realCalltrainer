@@ -159,23 +159,17 @@
       button.pill:active:not(:disabled) { transform: scale(0.98); }
       button:disabled { opacity: .35; cursor: not-allowed; }
 
-      /* Großer Anruf-/Auflegen-Button mit Beschriftung */
-      .bigwrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-      .bigcall {
-        width: 80px; height: 80px;
-        border-radius: 50%;
-        border: 4px solid rgba(255, 255, 255, 0.85);
+      /* Anruf-/Auflegen-Buttons: Text-Pills wie auf der Webseite */
+      button.callpill, button.hangpill {
+        border: none;
         color: #fff;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: transform 120ms ease;
+        font-weight: 600;
+        font-size: 16px;
+        min-height: 56px;
+        min-width: 220px;
       }
-      .bigcall svg { width: 34px; height: 34px; }
-      .bigcall:active:not(:disabled) { transform: scale(0.94); }
-      #startBtn { background: var(--good); box-shadow: 0 10px 24px -8px rgba(47, 164, 124, 0.45); }
-      #endBtn { background: var(--danger); box-shadow: 0 10px 24px -8px rgba(207, 68, 55, 0.45); }
-      #endBtn svg { transform: rotate(135deg); }
-      .biglabel { font-size: 14px; font-weight: 600; color: var(--ink); }
+      button.callpill { background: linear-gradient(140deg, #3cb98d, var(--good)); box-shadow: 0 10px 24px -10px rgba(47, 164, 124, 0.5); }
+      button.hangpill { background: linear-gradient(140deg, #e0685e, var(--danger)); box-shadow: 0 10px 24px -10px rgba(207, 68, 55, 0.5); }
 
       /* Phasen-Sichtbarkeit */
       .only-idle, .only-call { display: none !important; }
@@ -362,18 +356,8 @@
         </div>
         <button id="replayBtn" class="pill only-call" data-i18n="replay" disabled></button>
         <button id="pauseBtn" class="pill only-call" data-i18n="pause" disabled></button>
-        <div class="bigwrap only-idle">
-          <button id="startBtn" class="bigcall" aria-label="Anrufen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.02z"/></svg>
-          </button>
-          <div class="biglabel" data-i18n="callLabel"></div>
-        </div>
-        <div class="bigwrap only-call">
-          <button id="endBtn" class="bigcall" aria-label="Auflegen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.02z"/></svg>
-          </button>
-          <div class="biglabel" data-i18n="endLabel"></div>
-        </div>
+        <button id="startBtn" class="pill callpill only-idle" data-i18n="callLabel"></button>
+        <button id="endBtn" class="pill hangpill only-call" data-i18n="endLabel"></button>
       </div>
     </div>
 

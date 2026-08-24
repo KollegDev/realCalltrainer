@@ -110,7 +110,10 @@ const STR = {
   },
 };
 
-let lang = localStorage.getItem(LANG_KEY) || 'de';
+// Default: the device language. No first-run popup — the user can switch it
+// any time in the menu.
+let lang = localStorage.getItem(LANG_KEY)
+  || ((navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en');
 const t = (key) => (STR[lang] && STR[lang][key]) || STR.de[key] || key;
 
 /* ── elements ───────────────────────────────────────────────────────────── */
@@ -217,7 +220,6 @@ els.introOk.addEventListener('click', () => {
   localStorage.setItem(INTRO_KEY, 'seen');
   closeOverlay(els.introOverlay);
 });
-if (localStorage.getItem(INTRO_KEY) !== 'seen') openOverlay(els.introOverlay);
 
 /* ── roles & difficulty ─────────────────────────────────────────────────── */
 
