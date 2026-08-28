@@ -8,7 +8,7 @@
 // - Hashed assets (/assets/*) are cache-first — their names change per build.
 // - Bump CACHE when the precache list changes.
 
-const CACHE = 'ct-old-v1';
+const CACHE = 'ct-old-v2';
 const PRECACHE = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -28,6 +28,8 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  // Never touch the stats API: votes and tracking must always hit the server.
+  if (url.pathname.startsWith('/api/')) return;
 
   if (req.mode === 'navigate') {
     e.respondWith(

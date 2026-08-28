@@ -115,6 +115,29 @@
       }
       .r-tag { font-size: 12.5px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
 
+      /* Vote-Zeile: mobil-optimiert, 44dp-Ziele */
+      .voterow {
+        padding: 8px 14px;
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      }
+      .vote-caption { font-size: 13px; color: var(--body); font-weight: 500; line-height: 1.3; }
+      .vote-controls { display: flex; align-items: center; gap: 6px; flex: none; }
+      .votebtn {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        border: 1px solid rgba(20, 22, 28, 0.08);
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 18px; line-height: 1;
+        cursor: pointer;
+        color: var(--muted);
+      }
+      .votebtn.up:not(:disabled):active { color: var(--good); }
+      .votebtn.down:not(:disabled):active { color: var(--danger); }
+      .votebtn.voted.up { color: var(--good); border-color: rgba(47,164,124,0.4); }
+      .votebtn.voted.down { color: var(--danger); border-color: rgba(207,68,55,0.4); }
+      .votebtn:disabled { opacity: .45; cursor: default; }
+      .vote-balance { min-width: 34px; text-align: center; font-size: 15px; font-weight: 700; color: var(--ink); }
+
       /* Mikrofon-Zeile */
       .micline { padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
       .micline svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
@@ -340,6 +363,16 @@
         <div id="roleTag" class="r-tag"></div>
       </div>
 
+      <!-- Feedback: Upvote / Balance / Downvote — einmal pro Session -->
+      <div class="glass voterow">
+        <span id="voteCaption" class="vote-caption" data-i18n="voteCaption"></span>
+        <div class="vote-controls">
+          <button id="voteUp" class="votebtn up" aria-label="Upvote">▲</button>
+          <span id="voteBalance" class="vote-balance">–</span>
+          <button id="voteDown" class="votebtn down" aria-label="Downvote">▼</button>
+        </div>
+      </div>
+
       <!-- Mikrofon wie früher direkt sichtbar -->
       <div class="glass micline">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
@@ -414,6 +447,7 @@
           </span>
         </div>
         <a id="miPrivacy" class="menuitem" href="/privacy.html" target="_blank" rel="noopener"><span data-i18n="miPrivacy"></span><span>↗</span></a>
+        <a id="miImpressum" class="menuitem" href="/impressum.html" target="_blank" rel="noopener"><span data-i18n="miImpressum"></span><span>↗</span></a>
         <div class="hint" style="padding: 10px 4px;" data-i18n="micHint"></div>
       </div>
     </div>

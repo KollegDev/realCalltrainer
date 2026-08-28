@@ -28,6 +28,9 @@ const STR = {
     save: 'Speichern', reset: 'Auf Original zurücksetzen',
     editedBadge: 'angepasst',
     miIntro: 'Intro', miLang: 'Sprache', miMic: 'Mikrofon', miPrivacy: 'Datenschutz',
+    miImpressum: 'Impressum',
+    voteCaption: 'Gefällt dir CallTrainer? Stimm ab:',
+    voteThanks: 'Danke für dein Feedback!',
     micLevelLabel: 'Pegel',
     micHint: 'Kopfhörer nutzen, damit die KI sich nicht selbst hört. Echtes Mikrofon wählen (kein virtuelles/VR-Gerät).',
     introTitle: 'CallTrainer',
@@ -73,6 +76,9 @@ const STR = {
     save: 'Save', reset: 'Reset to original',
     editedBadge: 'edited',
     miIntro: 'Intro', miLang: 'Language', miMic: 'Microphone', miPrivacy: 'Privacy',
+    miImpressum: 'Legal notice',
+    voteCaption: 'Enjoying CallTrainer? Vote:',
+    voteThanks: 'Thanks for your feedback!',
     micLevelLabel: 'Level',
     micHint: 'Use headphones so the AI does not hear itself. Pick your real microphone (no virtual/VR device).',
     introTitle: 'CallTrainer',
@@ -134,6 +140,7 @@ const els = {
   introLangDe: $('introLangDe'), introLangEn: $('introLangEn'), introOk: $('introOk'),
   mic: $('mic'), micLevel: $('micLevel'),
   consentBtn: $('consentBtn'), reportBtn: $('reportBtn'),
+  voteCaption: $('voteCaption'), voteUp: $('voteUp'), voteDown: $('voteDown'), voteBalance: $('voteBalance'),
   transcript: $('transcript'),
   scoreNum: $('scoreNum'), scoreVerdict: $('scoreVerdict'), scoreOutcome: $('scoreOutcome'),
   scoreStrengths: $('scoreStrengths'), scoreMistakes: $('scoreMistakes'),
@@ -193,6 +200,7 @@ function applyLang() {
   els.pause.textContent = paused ? t('resume') : t('pause');
   [els.langDe, els.introLangDe].forEach((b) => b.classList.toggle('on', lang === 'de'));
   [els.langEn, els.introLangEn].forEach((b) => b.classList.toggle('on', lang === 'en'));
+  if (sessionStorage.getItem('ct.voted')) els.voteCaption.textContent = t('voteThanks');
   populateRoles();
   populateDifficulty();
   if (!call) setStatus(t('stReady'), '');
@@ -220,6 +228,10 @@ els.introOk.addEventListener('click', () => {
   localStorage.setItem(INTRO_KEY, 'seen');
   closeOverlay(els.introOverlay);
 });
+// First run: the intro doubles as the language picker. The chosen language
+// drives everything downstream — UI strings, the role list, and thus the
+// language the prospect speaks and is graded in.
+if (localStorage.getItem(INTRO_KEY) !== 'seen') openOverlay(els.introOverlay);
 
 /* ── roles & difficulty ─────────────────────────────────────────────────── */
 
@@ -410,6 +422,7 @@ async function startCall() {
   setPhase('call');
   setControls({ start: false, pause: false, replay: false, end: true });
   setStatus(t('stDialing'), 'ringing');
+  track('call_started');
 
   try {
     player = new AudioPlayer();
@@ -622,6 +635,7 @@ async function grade() {
     outcome: outcome || 'hangup_user',
   };
 
+  track('call_ended');
   const llm = new GeminiLLM({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
   const result = await gradeCall(llm, report);
   renderScorecard(result, role.lang === 'de');
@@ -710,6 +724,59 @@ els.reportBtn.addEventListener('click', () => {
   window.location.href =
     `mailto:info@supershipper.ai?subject=${encodeURIComponent(t('reportSubject'))}&body=${body}`;
 });
+
+/* ── votes & anonymous tracking ─────────────────────────────────────────── */
+// A random id per browser — no account, no personal data; documented in the
+// privacy policy. Votes are gameable by design ("just an indicator").
+
+const SID_KEY = 'ct.sid';
+const VOTED_KEY = 'ct.voted'; // sessionStorage: once per session
+let sid = localStorage.getItem(SID_KEY);
+if (!sid) {
+  sid = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)).replace(/-/g, '').slice(0, 16);
+  localStorage.setItem(SID_KEY, sid);
+}
+
+async function api(pathname, body) {
+  try {
+    const res = await fetch(pathname, body
+      ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      : undefined);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; } // dev server has no API; fail silently
+}
+
+const track = (event) => { api('/api/track', { event, sid, lang }); };
+
+function renderVotes(v) {
+  if (!v) return;
+  els.voteBalance.textContent = String(v.up - v.down);
+}
+
+function markVoted(dir) {
+  els.voteUp.disabled = true;
+  els.voteDown.disabled = true;
+  if (dir) (dir === 'up' ? els.voteUp : els.voteDown).classList.add('voted');
+  els.voteCaption.textContent = t('voteThanks');
+}
+
+async function vote(dir) {
+  if (sessionStorage.getItem(VOTED_KEY)) return;
+  sessionStorage.setItem(VOTED_KEY, dir);
+  markVoted(dir);
+  renderVotes(await api('/api/vote', { dir, sid }));
+}
+
+els.voteUp.addEventListener('click', () => vote('up'));
+els.voteDown.addEventListener('click', () => vote('down'));
+
+(async () => {
+  renderVotes(await api('/api/votes'));
+  const prev = sessionStorage.getItem(VOTED_KEY);
+  if (prev) markVoted(prev);
+})();
+track('visit');
 
 /* ── events & boot ──────────────────────────────────────────────────────── */
 
