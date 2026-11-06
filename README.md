@@ -91,3 +91,7 @@ https://ai.google.dev/gemini-api/docs/live-api/ephemeral-tokens
 - End-of-call scoring (feed the transcript to a cheap text model for a rubric score).
 - "True redo" — delete your last exchange so the prospect re-reacts to a new attempt.
 - Save/replay whole sessions.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
